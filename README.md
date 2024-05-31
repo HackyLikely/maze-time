@@ -34,8 +34,3 @@ If you want to create a video of the generation, just write on terminal:
 
 This will create the file `gen_maze_2024-05-31_14-45-57-070484.mp4` from the images.
 
-<video controls width="300" height="300">
-  <source src="gen_maze_2024-05-31_14-45-57-070484.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
-
