@@ -34,3 +34,13 @@ If you want to create a video of the generation, just write on terminal:
 
 This will create the file `gen_maze_2024-05-31_14-45-57-070484.mp4` from the images.
 
+
+If you want to create a gif of the generation, just write on terminal:
+
+```bash
+./make_gif.py gen_maze_2024-05-31_14-45-57-070484/
+```
+
+This will create the file `gen_maze_2024-05-31_14-45-57-070484.gif` from the images.
+
+![gen_maze_2024-05-31_14-45-57-070484.gif](gen_maze_2024-05-31_14-45-57-070484.gif)
