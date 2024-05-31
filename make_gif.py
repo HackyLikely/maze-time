@@ -20,7 +20,7 @@ def create_gif_from_images(directory, output_file, fps=12):
 
     # Write GIF file
     duration = 1/fps
-    imageio.mimsave(output_file, images, duration=duration)
+    imageio.mimsave(output_file, images, duration=duration, loop=0)
 
 
 
