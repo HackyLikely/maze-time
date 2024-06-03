@@ -60,6 +60,9 @@ iDARK   = 5
 # Highlight the cell for visualization (overlay current)
 iHIGH   = 6
 
+# Cell is tagged to be backtracked in backtrack stack
+iBACK   = 7
+
 
 
 
@@ -254,6 +257,23 @@ def remove_high(cell):
 
 
 
+def is_back(cell):
+    bitmask = 1 << iBACK  
+    return (cell & bitmask) != 0
+
+def set_back(cell):
+    bitmask = 1 << iBACK  
+    cell |= bitmask
+    return cell
+
+def remove_back(cell):
+    bitmask = ~(1 << iBACK)
+    cell &= bitmask
+    return cell
+
+
+
+
 def has_unvisited_neighbors(maze, x, y):
     """
     Checks if the given cell has unvisited neighbors in the maze.
@@ -404,6 +424,7 @@ def draw_maze(maze):
     bg_col      = '#f7f7f7'     # Color for background
     curr_col    = '#ff2d38'     # Color for current cell
     high_col    = '#2e43ff'     # Color for highlighted cell
+    back_col    = '#d8f59f'     # Color for backtracking cell
     dark_col    = '#ababab'     # Color for dark cell
     wall_thick  = 2             # wall thickness  
     wall_col    = '#000000'     # Color for walls
@@ -419,12 +440,17 @@ def draw_maze(maze):
             ax.add_patch(rect)
 
             # Overlay special cells
-            if is_dark(cell):
+            if is_back(cell):
+                x1 = (x+1)*cell_width   # top left
+                y1 = (y+1)*cell_height  # 
+                rect = patches.Rectangle((x1, y1), cell_width, cell_height, linewidth=0, edgecolor=None, facecolor=back_col)
+                ax.add_patch(rect)
+            elif is_dark(cell):
                 x1 = (x+1)*cell_width   # top left
                 y1 = (y+1)*cell_height  # 
                 rect = patches.Rectangle((x1, y1), cell_width, cell_height, linewidth=0, edgecolor=None, facecolor=dark_col)
                 ax.add_patch(rect)
-            
+
             if is_high(cell):
                 margin_w    = 0.2*cell_width
                 margin_h    = 0.2*cell_height
@@ -557,6 +583,7 @@ def create_output_dir(prefix=""):
 # Binary-Tree (South-East)
 # Aldous-Broder
 # Hunt-and-Kill
+# Randomized Depth-First-Search
 # ----------------------------------------------------------------
 
 def gen_binary_tree_se(height, width, save_gen=False):
@@ -939,6 +966,141 @@ def gen_hunt_and_kill(height, width, save_gen=False):
 
     # Remove the current flag (if any)
     maze[y][x] = remove_current(maze[y][x])
+
+    # Save last img: clean maze
+    # ----------------
+    if save_gen:
+        draw_maze(maze)
+        # Get current time with milliseconds
+        current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")
+        # Construct filename with current time
+        filename = f"{current_time}.png"
+        save_plt(output_dir, filename)
+
+
+    return maze
+
+
+
+
+
+
+def gen_random_dfs(height, width, save_gen=False):
+    """
+    Generates a maze using the Randomized Depth-First-Search algorithm.
+    Also known as the "recursive backtracker" algorithm.
+    Iterative implementation (with stack)
+
+    Args:
+    height (int): Height of the maze grid.
+    width (int): Width of the maze grid.
+    save_gen (bool): Save images of the generation
+
+    Returns:
+    list: 2D list representing the generated maze.
+    """
+
+    # Create the output_dir if save_gen
+    if save_gen:
+        output_dir = create_output_dir("gen_maze_")
+
+    # Init maze with all walls and dark cells
+    maze    = init_maze(height, width)
+
+    # Start from a random cell
+    x = random.randint(0, width - 1)
+    y = random.randint(0, height - 1)
+
+    # Mark the cell as to backtrack
+    maze[y][x] = set_back(maze[y][x])
+
+    # Push it to the backtrack stack
+    backtrack_stack = [(x, y)]
+
+    # While the stack is not empty
+    while backtrack_stack:
+
+        # Remove the current flag (if any)
+        maze[y][x] = remove_current(maze[y][x])
+
+        # Pop a cell from the stack 
+        px, py = backtrack_stack.pop()
+
+        # Here, if we are in a different cell (from prev one)
+        # we had moved in backtracking algorithm
+        if (px, py) != (x, y):
+            # Remove the backtrack flag (already backtracked)
+            maze[y][x] = remove_back(maze[y][x])
+            # Remove the dark flag
+            maze[y][x] = remove_dark(maze[y][x])
+
+        # Update coord
+        x, y = px, py
+
+        # Mark the cell as current
+        maze[y][x] = set_current(maze[y][x])
+
+        # Save before wall removal
+        # ----------------
+        if save_gen:
+            draw_maze(maze)
+            # Get current time with milliseconds
+            current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")
+            # Construct filename with current time
+            filename = f"{current_time}.png"
+            save_plt(output_dir, filename)
+
+        # Init a list of shuffle directions
+        iDIR_list = list(range(len(directions)))
+        random.shuffle(iDIR_list)
+
+        # while a direction is not yet checked 
+        while iDIR_list:
+
+            # Chose a direction
+            iDIR = iDIR_list.pop()
+            
+            # Get the coord of the candidate cell in that direction 
+            nx, ny = move_from(x, y, iDIR, steps=1)
+
+            # Check if it is a valid maze cell
+            if is_valid(maze, nx, ny):
+
+                # Check if the cell is an unvisited neighbour
+                # aka if is dark but not to be backtracked
+                if is_dark(maze[ny][nx]) and not is_back(maze[ny][nx]):
+                    
+                    # Remove the wall between the current cell and the chosen cell
+                    maze[y][x]   = remove_wall(maze[y][x], iDIR)
+                    maze[ny][nx] = remove_wall(maze[ny][nx], ((iDIR+2)%len(directions)))
+
+                    # Push the current cell to the stack (to be backtracked)
+                    backtrack_stack.append((x,y))
+
+                    # Remove the current flag
+                    maze[y][x] = remove_current(maze[y][x])
+
+                    # Mark the chosen cell as the new current
+                    x, y, = nx, ny
+                    maze[y][x] = set_current(maze[y][x])
+
+                    # Mark the cell as to backtrack
+                    maze[y][x] = set_back(maze[y][x])
+
+                    # Push the current cell to the stack
+                    backtrack_stack.append((x,y))
+                    
+                    # goto new backtrack loop 
+                    # in this case will be from the current cell
+                    break
+
+
+    # Remove last cell as current
+    maze[y][x] = remove_current(maze[y][x])
+    # Remove the dark flag
+    maze[y][x] = remove_dark(maze[y][x])
+    # Remove the backtracked flag
+    maze[y][x] = remove_back(maze[y][x])
 
     # Save last img: clean maze
     # ----------------

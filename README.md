@@ -10,6 +10,7 @@ Impplemented algorithms:
 - Binary-Tree (South-East)
 - Aldous-Broder
 - Hunt-and-Kill
+- Randomized Depth-First-Search
 
 
 You can create a main script like:
@@ -54,4 +55,20 @@ If you want to create a gif of the generation, just write on terminal:
 
 This will create the file `gen_maze_2024-05-31_14-45-57-070484.gif` from the images.
 
+## Examples
+
+### Binary-Tree (South-East)
+
 ![gen_maze_2024-05-31_14-45-57-070484.gif](gen_maze_2024-05-31_14-45-57-070484.gif)
+
+### Aldous-Broder
+
+![gen_maze_2024-06-03_11-29-56-927654.gif](gen_maze_2024-06-03_11-29-56-927654.gif)
+ 
+### Hunt-and-Kill
+
+![gen_maze_2024-06-03_12-48-02-762343.gif](gen_maze_2024-06-03_12-48-02-762343.gif)
+
+### Randomized Depth-First-Search
+
+![gen_maze_2024-06-03_17-02-52-149970.gif](gen_maze_2024-06-03_17-02-52-149970.gif)
