@@ -9,6 +9,7 @@ Impplemented algorithms:
     
 - Binary-Tree (South-East)
 - Aldous-Broder
+- Hunt-and-Kill
 
 
 You can create a main script like:
