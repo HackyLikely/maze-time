@@ -4,6 +4,13 @@ Explore the world of mazes.
 Collection of functions to visualize maze algorithms.
 
 ## Generation of a maze
+
+Impplemented algorithms:
+    
+- Binary-Tree (South-East)
+- Aldous-Broder
+
+
 You can create a main script like:
 
 ```python
@@ -26,6 +33,8 @@ In such directory thare is all the images of the maze generation:
     2024-05-31_14-45-57-972846.png
     ...
 
+## Make video of the maze generation
+
 If you want to create a video of the generation, just write on terminal:
 
 ```bash
@@ -34,6 +43,7 @@ If you want to create a video of the generation, just write on terminal:
 
 This will create the file `gen_maze_2024-05-31_14-45-57-070484.mp4` from the images.
 
+## Make gif of the maze generation
 
 If you want to create a gif of the generation, just write on terminal:
 
