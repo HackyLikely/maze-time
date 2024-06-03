@@ -244,6 +244,7 @@ def remove_dark(cell):
 def print_maze(maze, space=4):
     """
     Prints a 2D list (maze) in a formatted manner.
+    Prints the integer values reppresenting the maze.
 
     Parameters:
     maze (list of list): A 2D list where each sublist represents a row in the maze.
@@ -260,6 +261,14 @@ def print_maze(maze, space=4):
 
 
 def print_maze_as_ascii(maze):
+    """
+    Prints a 2D list (maze) in a ASCII manner.
+    Prints only walls.
+
+    Parameters:
+    maze (list of list): A 2D list where each sublist represents a row in the maze.
+                         Each element in the sublist represents a cell in that row.
+    """
 
     # Maze params
     height  = len(maze)
@@ -297,6 +306,15 @@ def print_maze_as_ascii(maze):
 
 
 def draw_maze(maze):
+    """
+    Draw into a matplotlib new figure the maze. 
+    Draw into ax.
+    Do not show the plot.
+
+    Parameters:
+    maze (list of list): A 2D list where each sublist represents a row in the maze.
+                         Each element in the sublist represents a cell in that row.
+    """
 
     # Maze params
     height  = len(maze)
@@ -381,6 +399,10 @@ def draw_maze(maze):
 
 
 def show_plt():
+    """
+    Show the current plot.
+    """
+
     # Show
     plt.show()
 
@@ -388,7 +410,14 @@ def show_plt():
 
 
 def save_plt(outdir, fname):
+    """
+    Save the current figure of the maze into a png file. 
+    Try to save a 512x512 pixel image.
 
+    Parameters:
+    outdir (string): The path of the output directory where to save the figure.
+    fname (string): The name of the file.
+    """
     # DPI = pixels/inches
 
     # Get the size of the figure in inches
