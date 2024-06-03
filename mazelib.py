@@ -471,6 +471,9 @@ def create_output_dir(prefix=""):
 
 # Maze Generation
 # ----------------------------------------------------------------
+# Binary-Tree (South-East)
+# Aldous-Broder
+# ----------------------------------------------------------------
 
 def gen_binary_tree_se(height, width, save_gen=False):
     """
@@ -491,7 +494,7 @@ def gen_binary_tree_se(height, width, save_gen=False):
     if save_gen:
         output_dir = create_output_dir("gen_maze_")
     
-    # Init maze with all walls
+    # Init maze with all walls and dark cells
     maze    = init_maze(height, width)
    
     # Main gen loop
@@ -567,3 +570,119 @@ def gen_binary_tree_se(height, width, save_gen=False):
     # Return
     return maze
 
+
+
+def gen_aldous_broder(height, width, save_gen=False):
+    """
+    Generates a maze using Aldous-Broder algorithm.
+    Pick a random cell as the current cell and mark it as visited.
+    While there are unvisited cells:
+        Pick a random neighbour.
+        If the chosen neighbour has not been visited:
+            Remove the wall between the current cell and the chosen neighbour.
+            Mark the chosen neighbour as visited.
+        Make the chosen neighbour the current cell.
+
+    Un-visited cells are DARK.
+    Visited cells are DARK removed.
+
+    Args:
+    height (int): Height of the maze grid.
+    width (int): Width of the maze grid.
+    save_gen (bool): Save images of the generation
+
+    Returns:
+    list: 2D list representing the generated maze.
+    """
+
+    # Create the output_dir if save_gen
+    if save_gen:
+        output_dir = create_output_dir("gen_maze_")
+    
+    # Init maze with all walls and dark cells
+    maze    = init_maze(height, width)
+
+
+    # Start from a random cell
+    x = random.randint(0, width - 1)
+    y = random.randint(0, height - 1)
+
+    # Mark the cell as current
+    maze[y][x] = set_current(maze[y][x])
+    # Remove the dark flag
+    maze[y][x] = remove_dark(maze[y][x])
+
+    # Counter of remaining (not visited) cells
+    remaining = width * height - 1
+
+    # Save before wall removal
+    # ----------------
+    if save_gen:
+        draw_maze(maze)
+        # Get current time with milliseconds
+        current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")
+        # Construct filename with current time
+        filename = f"{current_time}.png"
+        save_plt(output_dir, filename)
+
+
+    # Main loop
+    while remaining:
+
+        # Chose a random direction
+        iDIR = random_idir()
+
+        # Get coordinates of a neighbor
+        nx, ny = move_from(x, y, iDIR, 1) 
+
+        # Check if it is a valid cell 
+        if is_valid(maze, nx, ny):
+
+            # Remove the current flag
+            maze[y][x] = remove_current(maze[y][x])
+
+            # Check if the neighbor is not visited
+            if is_dark(maze[ny][nx]):
+
+                # Remove the wall between the current cell and the chosen cell
+                maze[y][x]   = remove_wall(maze[y][x], iDIR)
+                maze[ny][nx] = remove_wall(maze[ny][nx], ((iDIR+2)%len(directions)))
+
+                # Remove the dark flag
+                maze[ny][nx] = remove_dark(maze[ny][nx])
+
+                # Update the remaining cells
+                remaining -= 1
+
+            # Update coord with valid cell anyway
+            x, y = nx, ny
+
+            # Mark the cell as current
+            maze[y][x] = set_current(maze[y][x])
+
+            # Save after step move
+            # ----------------
+            if save_gen:
+                draw_maze(maze)
+                # Get current time with milliseconds
+                current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")
+                # Construct filename with current time
+                filename = f"{current_time}.png"
+                save_plt(output_dir, filename)
+
+
+    # Remove the last current flag
+    maze[y][x] = remove_current(maze[y][x])
+
+    # Save last img: clean maze
+    # ----------------
+    if save_gen:
+        draw_maze(maze)
+        # Get current time with milliseconds
+        current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")
+        # Construct filename with current time
+        filename = f"{current_time}.png"
+        save_plt(output_dir, filename)
+
+    # Return
+    return maze
